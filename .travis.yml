@@ -1,0 +1,21 @@
+language: ruby
+services:
+  - docker
+sudo: required
+before_install:
+  - docker build -t condition-report-service .
+  - docker run -d -p 127.0.0.1:4000:8080 condition-report-service
+  - docker ps -a
+  - docker run carlad/sinatra /bin/sh -c "cd /root/sinatra; bundle exec rake test"
+jobs:
+  include:
+    - stage: unit tests
+      script: "Running unit tests (1)"
+    - stage: unit tests
+      script: "Running unit tests (2)"
+    - stage: deploy to production
+      script: skip
+      deploy:
+        provider: heroku
+        api_key: $HEROKU_AUTH_TOKEN_PROD
+        app: my-app-123
